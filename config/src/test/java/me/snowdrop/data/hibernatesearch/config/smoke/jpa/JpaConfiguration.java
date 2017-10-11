@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package me.snowdrop.data.hibernatesearch.config;
+package me.snowdrop.data.hibernatesearch.config.smoke.jpa;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;

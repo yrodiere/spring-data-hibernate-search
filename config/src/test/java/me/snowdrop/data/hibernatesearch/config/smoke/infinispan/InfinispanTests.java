@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package me.snowdrop.data.hibernatesearch.config.smoke;
+package me.snowdrop.data.hibernatesearch.config.smoke.infinispan;
 
 import me.snowdrop.data.hibernatesearch.TestUtils;
 import me.snowdrop.data.hibernatesearch.config.EntityToCacheMapper;
 import me.snowdrop.data.hibernatesearch.config.HibernateSearchDataJpaAutoConfiguration;
-import me.snowdrop.data.hibernatesearch.config.InfinispanConfiguration;
-import me.snowdrop.data.hibernatesearch.config.smoke.hibernatesearch.FruitHibernateSearchRepository;
+import me.snowdrop.data.hibernatesearch.config.smoke.Fruit;
+import me.snowdrop.data.hibernatesearch.config.smoke.repository.standalone.hibernatesearch.FruitStandaloneHibernateSearchRepository;
 import me.snowdrop.data.hibernatesearch.repository.config.EnableHibernateSearchRepositories;
 import org.infinispan.Cache;
 import org.junit.After;
@@ -41,10 +41,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest(classes = InfinispanConfiguration.class, properties = "debug=false")
 @RunWith(SpringRunner.class)
 @EnableAutoConfiguration(exclude = {HibernateSearchDataJpaAutoConfiguration.class, HibernateJpaAutoConfiguration.class, JpaRepositoriesAutoConfiguration.class})
-@EnableHibernateSearchRepositories(basePackageClasses = FruitHibernateSearchRepository.class)
+@EnableHibernateSearchRepositories(basePackageClasses = FruitStandaloneHibernateSearchRepository.class)
 public class InfinispanTests {
   @Autowired
-  FruitHibernateSearchRepository hsRepository;
+  FruitStandaloneHibernateSearchRepository hsRepository;
 
   @Autowired
   EntityToCacheMapper entityToCacheMapper;

@@ -14,24 +14,43 @@
  * limitations under the License.
  */
 
-package me.snowdrop.data.hibernatesearch.config.ops;
+package me.snowdrop.data.hibernatesearch.config.smoke.jpa.extension;
 
+import me.snowdrop.data.hibernatesearch.TestUtils;
 import me.snowdrop.data.hibernatesearch.config.HibernateSearchDataInfinispanAutoConfiguration;
 import me.snowdrop.data.hibernatesearch.config.smoke.jpa.JpaConfiguration;
-import me.snowdrop.data.hibernatesearch.ops.OpsDefaultBase;
-import me.snowdrop.data.hibernatesearch.ops.OpsRepository;
-import me.snowdrop.data.hibernatesearch.repository.config.EnableHibernateSearchRepositories;
+import me.snowdrop.data.hibernatesearch.config.smoke.Fruit;
+import me.snowdrop.data.hibernatesearch.config.smoke.repository.extension.jpa.FruitExtendedJpaRepository;
+import org.junit.Assert;
+import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringRunner;
 
 /**
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-@SpringBootTest(classes = JpaConfiguration.class)
+@SpringBootTest(classes = {JpaConfiguration.class, ExtendedJpaRepositoryConfiguration.class}, properties = "debug=false")
 @RunWith(SpringRunner.class)
 @EnableAutoConfiguration(exclude = HibernateSearchDataInfinispanAutoConfiguration.class)
-@EnableHibernateSearchRepositories(basePackageClasses = OpsRepository.class)
-public class JpaOpsTests extends OpsDefaultBase {
+public class ExtendedJpaTests {
+  @Autowired
+  FruitExtendedJpaRepository jpaRepository;
+
+  @Test
+  public void testDefault() {
+    Assert.assertNotNull(jpaRepository);
+
+    Assert.assertEquals(3, jpaRepository.count());
+
+    Assert.assertEquals(3, TestUtils.size(jpaRepository.findAll()));
+
+    // Ask for a lowercase match, which would only work with Hibernate Search, not with the JPQL 'equals'
+    Fruit apple = jpaRepository.findByName("apple");
+    Assert.assertNotNull(apple);
+    Assert.assertEquals("Apple", apple.getName());
+  }
 }

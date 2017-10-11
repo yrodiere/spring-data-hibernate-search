@@ -17,7 +17,7 @@
 package me.snowdrop.data.hibernatesearch.config.ops;
 
 import me.snowdrop.data.hibernatesearch.config.HibernateSearchDataJpaAutoConfiguration;
-import me.snowdrop.data.hibernatesearch.config.InfinispanConfiguration;
+import me.snowdrop.data.hibernatesearch.config.smoke.infinispan.InfinispanConfiguration;
 import me.snowdrop.data.hibernatesearch.ops.OpsRepository;
 import me.snowdrop.data.hibernatesearch.ops.OpsSortBase;
 import me.snowdrop.data.hibernatesearch.repository.config.EnableHibernateSearchRepositories;

@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package me.snowdrop.data.hibernatesearch.config.smoke;
+package me.snowdrop.data.hibernatesearch.config.smoke.jpa.standalone;
 
 import me.snowdrop.data.hibernatesearch.TestUtils;
 import me.snowdrop.data.hibernatesearch.config.HibernateSearchDataInfinispanAutoConfiguration;
-import me.snowdrop.data.hibernatesearch.config.JpaConfiguration;
-import me.snowdrop.data.hibernatesearch.config.smoke.hibernatesearch.FruitHibernateSearchRepository;
-import me.snowdrop.data.hibernatesearch.config.smoke.jpa.FruitRepository;
+import me.snowdrop.data.hibernatesearch.config.smoke.Fruit;
+import me.snowdrop.data.hibernatesearch.config.smoke.jpa.JpaConfiguration;
+import me.snowdrop.data.hibernatesearch.config.smoke.repository.standalone.hibernatesearch.FruitStandaloneHibernateSearchRepository;
+import me.snowdrop.data.hibernatesearch.config.smoke.repository.standalone.jpa.FruitStandaloneJpaRepository;
 import me.snowdrop.data.hibernatesearch.repository.config.EnableHibernateSearchRepositories;
 import org.junit.Assert;
 import org.junit.Test;
@@ -37,14 +38,14 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest(classes = JpaConfiguration.class, properties = "debug=false")
 @RunWith(SpringRunner.class)
 @EnableAutoConfiguration(exclude = HibernateSearchDataInfinispanAutoConfiguration.class)
-@EnableHibernateSearchRepositories(basePackageClasses = FruitHibernateSearchRepository.class)
-@EnableJpaRepositories(basePackageClasses = FruitRepository.class)
-public class JpaTests {
+@EnableJpaRepositories(basePackageClasses = FruitStandaloneJpaRepository.class)
+@EnableHibernateSearchRepositories(basePackageClasses = FruitStandaloneHibernateSearchRepository.class)
+public class StandaloneJpaTests {
   @Autowired
-  FruitHibernateSearchRepository hsRepository;
+  FruitStandaloneHibernateSearchRepository hsRepository;
 
   @Autowired
-  FruitRepository jpaRepository;
+  FruitStandaloneJpaRepository jpaRepository;
 
   @Test
   public void testDefault() {
@@ -57,7 +58,8 @@ public class JpaTests {
     Assert.assertEquals(3, TestUtils.size(hsRepository.findAll()));
     Assert.assertEquals(3, TestUtils.size(jpaRepository.findAll()));
 
-    Fruit apple = hsRepository.findByName("Apple");
+    // Ask for a lowercase match, which would only work with Hibernate Search, not with the JPQL 'equals'
+    Fruit apple = hsRepository.findByName("apple");
     Assert.assertNotNull(apple);
     Assert.assertEquals("Apple", apple.getName());
   }

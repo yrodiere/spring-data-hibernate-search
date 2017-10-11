@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package me.snowdrop.data.hibernatesearch.config;
+package me.snowdrop.data.hibernatesearch.config.smoke.infinispan;
 
 import java.util.List;
 
 import me.snowdrop.data.hibernatesearch.TestsAction;
+import me.snowdrop.data.hibernatesearch.config.EntityToCacheMapper;
 import me.snowdrop.data.hibernatesearch.config.smoke.Fruit;
 import me.snowdrop.data.hibernatesearch.ops.OpsTestsActionBase;
 import me.snowdrop.data.hibernatesearch.ops.SimpleEntity;
