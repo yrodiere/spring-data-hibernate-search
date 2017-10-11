@@ -16,33 +16,31 @@
 
 package me.snowdrop.data.hibernatesearch.config.smoke.jpa.extension;
 
-import me.snowdrop.data.hibernatesearch.config.smoke.Fruit;
-import me.snowdrop.data.hibernatesearch.config.smoke.repository.extension.hibernatesearch.FruitExtendingJpaHibernateSearchRepository;
-import me.snowdrop.data.hibernatesearch.config.smoke.repository.extension.hibernatesearch.FruitHibernateSearchRepositoryExtension;
+import me.snowdrop.data.hibernatesearch.config.smoke.repository.extension.hibernatesearch.FruitRepositoryHibernateSearchExtension;
 import me.snowdrop.data.hibernatesearch.repository.config.EnableHibernateSearchRepositories;
+import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@EnableHibernateSearchRepositories(basePackageClasses = FruitHibernateSearchRepositoryExtension.class)
+@EnableHibernateSearchRepositories(basePackageClasses = FruitRepositoryHibernateSearchExtension.class)
 public class HibernateSearchJpaRepositoryExtensionConfiguration {
 
   @Autowired
-  private FruitExtendingJpaHibernateSearchRepository fruit;
+  @Qualifier("fruitHibernateSearchRepositoryExtension")
+  private FruitRepositoryHibernateSearchExtension fruit;
 
   @Bean("fruitExtendedJpaRepositoryImpl") // CAUTION: name MUST be the one of the extended JPA interface + "Impl"
-  public FruitHibernateSearchRepositoryExtension fruitExtension() throws Exception {
-    // TODO use proxies instead of an anonymous class
-    // TODO do not require that users also define a separate HibernateSearchRepository
+  public FruitRepositoryHibernateSearchExtension fruitExtension() throws Exception {
     // TODO detect the required bean name automatically
     // TODO execute this code without the need for a user @Configuration (just with @EnableHibernateSearchXXX), and make sure to initialize eagerly (so that implementations are detected by JPA)
-    return new FruitHibernateSearchRepositoryExtension() {
-      @Override
-      public Fruit findByName(String name) {
-        return fruit.findByName( name );
-      }
-    };
+    // TODO make RepositoryExtension a root interface (do not extend Repository)
+    ProxyFactory proxyFactory = new ProxyFactory();
+    proxyFactory.setTarget(fruit);
+    proxyFactory.setInterfaces(FruitRepositoryHibernateSearchExtension.class);
+    return (FruitRepositoryHibernateSearchExtension) proxyFactory.getProxy();
   }
 
 }

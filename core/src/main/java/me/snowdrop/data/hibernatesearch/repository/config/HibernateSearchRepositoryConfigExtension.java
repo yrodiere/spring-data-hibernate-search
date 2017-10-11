@@ -17,16 +17,17 @@
 package me.snowdrop.data.hibernatesearch.repository.config;
 
 import java.lang.annotation.Annotation;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
 import me.snowdrop.data.hibernatesearch.repository.HibernateSearchRepository;
+import me.snowdrop.data.hibernatesearch.repository.RepositoryHibernateSearchExtension;
 import me.snowdrop.data.hibernatesearch.repository.support.HibernateSearchRepositoryFactoryBean;
 import org.hibernate.search.annotations.Indexed;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.core.annotation.AnnotationAttributes;
-import org.springframework.data.repository.config.AnnotationRepositoryConfigurationSource;
-import org.springframework.data.repository.config.RepositoryConfigurationExtensionSupport;
+import org.springframework.data.repository.config.*;
 
 /**
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
@@ -44,7 +45,7 @@ public class HibernateSearchRepositoryConfigExtension extends RepositoryConfigur
 
   @Override
   protected Collection<Class<?>> getIdentifyingTypes() {
-    return Collections.singletonList(HibernateSearchRepository.class);
+    return Arrays.asList(HibernateSearchRepository.class, RepositoryHibernateSearchExtension.class);
   }
 
   @Override

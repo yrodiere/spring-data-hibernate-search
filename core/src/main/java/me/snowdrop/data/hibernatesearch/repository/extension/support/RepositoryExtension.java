@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package me.snowdrop.data.hibernatesearch.repository.extension.support;
 
-package me.snowdrop.data.hibernatesearch.config.smoke.repository.extension.hibernatesearch;
+import org.springframework.data.repository.Repository;
 
-import me.snowdrop.data.hibernatesearch.config.smoke.Fruit;
-import me.snowdrop.data.hibernatesearch.repository.HibernateSearchRepository;
+import java.io.Serializable;
 
-public interface FruitExtendingJpaHibernateSearchRepository extends HibernateSearchRepository<Fruit, Long>, FruitHibernateSearchRepositoryExtension {
+public interface RepositoryExtension<T, ID extends Serializable> extends Repository<T, ID> {
 }

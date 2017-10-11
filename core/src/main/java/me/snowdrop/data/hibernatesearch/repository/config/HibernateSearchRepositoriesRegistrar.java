@@ -17,9 +17,16 @@
 package me.snowdrop.data.hibernatesearch.repository.config;
 
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.springframework.data.repository.config.RepositoryBeanDefinitionRegistrarSupport;
-import org.springframework.data.repository.config.RepositoryConfigurationExtension;
+import org.springframework.beans.factory.parsing.BeanComponentDefinition;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.core.type.AnnotationMetadata;
+import org.springframework.data.repository.config.*;
+import org.springframework.util.Assert;
 
 /**
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
@@ -35,4 +42,5 @@ public class HibernateSearchRepositoriesRegistrar extends RepositoryBeanDefiniti
   protected RepositoryConfigurationExtension getExtension() {
     return new HibernateSearchRepositoryConfigExtension();
   }
+
 }

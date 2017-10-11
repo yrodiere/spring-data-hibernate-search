@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package me.snowdrop.data.hibernatesearch.config.smoke.repository.extension.jpa;
+package me.snowdrop.data.hibernatesearch.config.smoke.repository.extension.hibernatesearch;
 
 import me.snowdrop.data.hibernatesearch.config.smoke.Fruit;
-import me.snowdrop.data.hibernatesearch.config.smoke.repository.extension.hibernatesearch.FruitRepositoryHibernateSearchExtension;
-import org.springframework.data.repository.PagingAndSortingRepository;
+import me.snowdrop.data.hibernatesearch.repository.RepositoryHibernateSearchExtension;
 
-public interface FruitExtendedJpaRepository extends PagingAndSortingRepository<Fruit, Long>, FruitRepositoryHibernateSearchExtension {
+public interface FruitRepositoryHibernateSearchExtension extends RepositoryHibernateSearchExtension<Fruit, Long> {
+  Fruit findByName(String name);
 }
