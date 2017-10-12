@@ -16,22 +16,22 @@
 package me.snowdrop.data.repository.extension.config;
 
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.data.repository.config.RepositoryConfiguration;
 import org.springframework.data.repository.config.RepositoryConfigurationExtension;
-import org.springframework.data.repository.config.RepositoryConfigurationSource;
 
 import java.util.Collection;
 
 public interface ExtendingRepositoryConfigurationExtension extends RepositoryConfigurationExtension {
 
   /**
-   * Returns all {@link RepositoryConfiguration}s for extensions obtained through the given {@link RepositoryConfigurationSource}.
+   * Returns all {@link RepositoryExtensionConfiguration}s for extension candidates obtained through
+   * the given {@link ExtendingRepositoryConfigurationSource}.
    *
    * @param configSource
    * @param loader
    * @return
    */
-  <T extends RepositoryConfigurationSource> Collection<RepositoryExtensionConfiguration<T>> getRepositoryExtensionConfigurations(
+  <T extends ExtendingRepositoryConfigurationSource>
+  Collection<RepositoryExtensionConfiguration<?>> getRepositoryExtensionConfigurations(
           T configSource, ResourceLoader loader);
 
 }

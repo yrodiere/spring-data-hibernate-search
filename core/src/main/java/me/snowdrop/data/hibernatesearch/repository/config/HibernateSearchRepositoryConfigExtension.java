@@ -44,7 +44,7 @@ public class HibernateSearchRepositoryConfigExtension extends ExtendingRepositor
   }
 
   @Override
-  protected Collection<Class<?>> getIdentifyingTypes() {
+  protected Collection<Class<?>> getIdentifyingRepositoryTypes() {
     return Collections.singletonList(HibernateSearchRepository.class);
   }
 

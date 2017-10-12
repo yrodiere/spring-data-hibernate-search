@@ -16,12 +16,17 @@
 
 package me.snowdrop.data.hibernatesearch.config.smoke.jpa.extension;
 
+import me.snowdrop.data.hibernatesearch.config.smoke.repository.extension.hibernatesearch.FruitRepositoryHibernateSearchExtension;
 import me.snowdrop.data.hibernatesearch.config.smoke.repository.extension.jpa.FruitExtendedJpaRepository;
-import me.snowdrop.data.hibernatesearch.repository.extension.config.EnableRepositoryHibernateSearchExtensions;
+import me.snowdrop.data.hibernatesearch.repository.config.EnableHibernateSearchRepositories;
+import me.snowdrop.data.hibernatesearch.repository.config.EnableHibernateSearchRepositories.Extend;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@EnableRepositoryHibernateSearchExtensions(basePackageClasses = FruitExtendedJpaRepository.class)
+@EnableHibernateSearchRepositories(
+        basePackageClasses = FruitRepositoryHibernateSearchExtension.class,
+        extend = @Extend(basePackageClasses = FruitExtendedJpaRepository.class)
+)
 public class HibernateSearchJpaRepositoryExtensionConfiguration {
 
 }

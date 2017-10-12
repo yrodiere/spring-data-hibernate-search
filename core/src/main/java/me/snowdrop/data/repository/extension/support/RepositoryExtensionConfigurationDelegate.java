@@ -17,139 +17,95 @@ package me.snowdrop.data.repository.extension.support;
 
 import me.snowdrop.data.repository.extension.config.ExtendingRepositoryConfigurationExtension;
 import me.snowdrop.data.repository.extension.config.RepositoryExtensionConfiguration;
-import me.snowdrop.data.repository.extension.config.RepositoryExtensionConfigurationSource;
+import me.snowdrop.data.repository.extension.config.ExtendingRepositoryConfigurationSource;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.parsing.BeanComponentDefinition;
-import org.springframework.beans.factory.support.AbstractBeanDefinition;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.core.env.Environment;
-import org.springframework.core.env.EnvironmentCapable;
-import org.springframework.core.env.StandardEnvironment;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.repository.config.*;
-import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
-/**
- * Delegate for configuration integration to reuse the general way of detecting repository extensions.
- * Customization is done by providing a configuration format specific {@link RepositoryConfigurationSource}
- * (currently either XML or annotations are supported).
- * The actual registration can then be triggered for different
- * {@link me.snowdrop.data.repository.extension.config.RepositoryExtensionConfiguration}s.
- * <p>
- * Copy/pasted and adapted from {@link RepositoryExtensionConfigurationDelegate}
- * in order to customize the name of produced beans.
- *
- * @author Oliver Gierke
- * @author Yoann Rodiere
- */
 public class RepositoryExtensionConfigurationDelegate {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RepositoryExtensionConfigurationDelegate.class);
 
-  private static final String REPOSITORY_EXTENSION_REGISTRATION = "Spring Data {} - Registering repository extension: {} - Interface: {} - Factory: {}";
+  private static final String REPOSITORY_EXTENSION_REGISTRATION = "Spring Data {} - Registering repository extension: {} - Interface: {} - Factory: {} - Extended interface: {}";
 
   static final String FACTORY_BEAN_OBJECT_TYPE = "factoryBeanObjectType";
 
-  private final RepositoryExtensionConfigurationSource configurationSource;
+  private final ExtendingRepositoryConfigurationSource configurationSource;
   private final ResourceLoader resourceLoader;
-  private final Environment environment;
-  private final boolean isXml;
+  private final RepositoryConfigurationDelegate delegate;
 
-  /**
-   * Creates a new {@link RepositoryExtensionConfigurationDelegate} for the given
-   * {@link RepositoryExtensionConfigurationSource} and {@link ResourceLoader} and {@link Environment}.
-   *
-   * @param configurationSource must not be {@literal null}.
-   * @param resourceLoader      must not be {@literal null}.
-   * @param environment         must not be {@literal null}.
-   */
   public RepositoryExtensionConfigurationDelegate(
-          RepositoryExtensionConfigurationSource configurationSource, ResourceLoader resourceLoader,
+          ExtendingRepositoryConfigurationSource configurationSource, ResourceLoader resourceLoader,
           Environment environment) {
-    this.isXml = configurationSource instanceof XmlRepositoryConfigurationSource;
-    boolean isAnnotation = configurationSource instanceof AnnotationRepositoryConfigurationSource;
-
-    Assert.isTrue(isXml || isAnnotation,
-            "Configuration source must either be an Xml- or an AnnotationBasedConfigurationSource!");
-    Assert.notNull(resourceLoader, "ResourceLoader must not be null!");
-
-    RepositoryBeanNameGenerator generator = new RepositoryBeanNameGenerator();
-    generator.setBeanClassLoader(resourceLoader.getClassLoader());
-
     this.configurationSource = configurationSource;
     this.resourceLoader = resourceLoader;
-    this.environment = defaultEnvironment(environment, resourceLoader);
+    this.delegate = new RepositoryConfigurationDelegate(configurationSource, resourceLoader, environment);
   }
 
   /**
-   * Defaults the environment in case the given one is null. Used as fallback, in case the legacy constructor was
-   * invoked.
-   *
-   * @param environment    can be {@literal null}.
-   * @param resourceLoader can be {@literal null}.
-   * @return
-   */
-  private static Environment defaultEnvironment(Environment environment, ResourceLoader resourceLoader) {
-    if (environment != null) {
-      return environment;
-    }
-
-    return resourceLoader instanceof EnvironmentCapable ? ((EnvironmentCapable) resourceLoader).getEnvironment()
-            : new StandardEnvironment();
-  }
-
-  /**
-   * Registers the found repositories in the given {@link BeanDefinitionRegistry}.
+   * Registers the found repositories and repository extensions in the given {@link BeanDefinitionRegistry}.
    *
    * @param registry
    * @param extension
    * @return {@link BeanComponentDefinition}s for all repository bean definitions found.
    */
-  public List<BeanComponentDefinition> registerRepositoriesIn(
+  public List<BeanComponentDefinition> registerRepositoriesAndExtensionsIn(
           BeanDefinitionRegistry registry, ExtendingRepositoryConfigurationExtension extension) {
-    extension.registerBeansForRoot(registry, configurationSource);
+    List<BeanComponentDefinition> originalDefinitions = delegate.registerRepositoriesIn(registry, extension);
+    Map<String, BeanComponentDefinition> definitionsByInterfaceName = originalDefinitions.stream()
+            .collect(Collectors.toMap(
+                    def -> (String) def.getBeanDefinition().getAttribute(FACTORY_BEAN_OBJECT_TYPE),
+                    Function.identity()
+            ));
+    List<BeanComponentDefinition> overriddenDefinitions = new ArrayList<>();
 
-    RepositoryBeanDefinitionBuilder builder = new RepositoryBeanDefinitionBuilder(
-            registry, extension, resourceLoader, environment);
-    List<BeanComponentDefinition> definitions = new ArrayList<BeanComponentDefinition>();
-
-    for (RepositoryExtensionConfiguration<? extends RepositoryConfigurationSource> configuration :
+    for (RepositoryExtensionConfiguration<?> extensionConfiguration :
             extension.getRepositoryExtensionConfigurations(configurationSource, resourceLoader)) {
-      RepositoryConfiguration<?> extendingRepositoryConfiguration = configuration.getExtendingRepositoryConfiguration();
-      BeanDefinitionBuilder definitionBuilder = builder.build(extendingRepositoryConfiguration);
-
-      extension.postProcess(definitionBuilder, configurationSource);
-
-      if (isXml) {
-        extension.postProcess(definitionBuilder, (XmlRepositoryConfigurationSource) configurationSource);
-      } else {
-        extension.postProcess(definitionBuilder, (AnnotationRepositoryConfigurationSource) configurationSource);
+      Class<?> repositoryExtensionInterface = extensionConfiguration.getRepositoryExtensionInterface();
+      BeanComponentDefinition originalExtensionDefinition =
+              definitionsByInterfaceName.get(repositoryExtensionInterface.getName());
+      if (originalExtensionDefinition == null) {
+        // FIXME debug log or error
+        continue;
       }
 
-      AbstractBeanDefinition beanDefinition = definitionBuilder.getBeanDefinition();
-      String extendingRepositoryImplementationClassName =
-              ClassUtils.getShortName(configuration.getExtendedRepositoryInterface())
-                      + configurationSource.getExtendedRepositoryImplementationPostfix();
-      String beanName = StringUtils.uncapitalize( extendingRepositoryImplementationClassName );
+      Class<?> extendedRepositoryInterface = extensionConfiguration.getExtendedRepositoryInterface();
+      String capitalizedBeanName = ClassUtils.getShortName(extendedRepositoryInterface)
+              + extensionConfiguration.getConfigurationSource().getExtensionImplementationPostfix();
+      String overriddenBeanName = StringUtils.uncapitalize(capitalizedBeanName);
 
       if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug(REPOSITORY_EXTENSION_REGISTRATION, extension.getModuleName(), beanName,
-                extendingRepositoryConfiguration.getRepositoryInterface(), extension.getRepositoryFactoryClassName());
+        LOGGER.debug(REPOSITORY_EXTENSION_REGISTRATION, extension.getModuleName(), overriddenBeanName,
+                repositoryExtensionInterface, extension.getRepositoryFactoryClassName(),
+                extendedRepositoryInterface);
       }
 
-      beanDefinition.setAttribute(FACTORY_BEAN_OBJECT_TYPE, extendingRepositoryConfiguration.getRepositoryInterface());
+      String originalBeanName = originalExtensionDefinition.getName();
+      if (registry.containsBeanDefinition(originalBeanName)) {
+        registry.removeBeanDefinition(originalBeanName);
+      }
 
-      registry.registerBeanDefinition(beanName, beanDefinition);
-      definitions.add(new BeanComponentDefinition(beanDefinition, beanName));
+      BeanDefinition extensionInternalDefinition = originalExtensionDefinition.getBeanDefinition();
+      registry.registerBeanDefinition(overriddenBeanName, extensionInternalDefinition);
+
+      BeanComponentDefinition overriddenComponentDefinition =
+              new BeanComponentDefinition(extensionInternalDefinition, overriddenBeanName);
+      overriddenDefinitions.add(overriddenComponentDefinition);
     }
 
-    return definitions;
+    return overriddenDefinitions;
   }
 }

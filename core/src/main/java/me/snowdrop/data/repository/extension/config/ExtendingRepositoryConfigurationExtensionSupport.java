@@ -18,12 +18,8 @@ package me.snowdrop.data.repository.extension.config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.support.AbstractBeanDefinition;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.data.repository.config.RepositoryConfiguration;
 import org.springframework.data.repository.config.RepositoryConfigurationExtensionSupport;
-import org.springframework.data.repository.config.RepositoryConfigurationSource;
 import org.springframework.util.Assert;
 
 import java.util.*;
@@ -31,31 +27,51 @@ import java.util.*;
 public abstract class ExtendingRepositoryConfigurationExtensionSupport extends RepositoryConfigurationExtensionSupport
         implements ExtendingRepositoryConfigurationExtension {
   private static final Logger LOGGER = LoggerFactory.getLogger(ExtendingRepositoryConfigurationExtensionSupport.class);
-  private static final String EXTENSION_SCANNING_CLASS_LOADING_ERROR = "%s - Extension scanning - Could not load type %s using class loader %s.";
-  private static final String EXTENSION_CANDIDATE_DROPPED = "%s - Extension scanning - Type %s does not implement any extension interface.";
+  private static final String EXTENSION_SCANNING_CLASS_LOADING_ERROR = "%s - Extend scanning - Could not load type %s using class loader %s.";
+  private static final String EXTENSION_CANDIDATE_DROPPED = "%s - Extend scanning - Type %s does not implement any extension interface.";
 
   @Override
-  public <T extends RepositoryConfigurationSource> Collection<RepositoryExtensionConfiguration<T>> getRepositoryExtensionConfigurations(
+  public <T extends ExtendingRepositoryConfigurationSource>
+  Collection<RepositoryExtensionConfiguration<?>> getRepositoryExtensionConfigurations(
           T configSource, ResourceLoader loader) {
     Assert.notNull(configSource, "ConfigSource must not be null!");
     Assert.notNull(loader, "Loader must not be null!");
 
-    Set<RepositoryExtensionConfiguration<T>> result = new HashSet<>();
+    Set<RepositoryExtensionConfiguration<?>> result = new HashSet<>();
 
-    for (BeanDefinition extensionCandidate : configSource.getCandidates(loader)) {
-      Class<?> extensionCandidateRepositoryInterface = loadRepositoryInterface(extensionCandidate, loader);
+    for (ExtendedRepositoryConfigurationSource extendedRepositorySource : configSource.getExtendedRepositorySources(loader)) {
+      for (BeanDefinition extensionCandidate : extendedRepositorySource.getCandidatesToExtension(loader)) {
+        Class<?> extensionCandidateRepositoryInterface = loadRepositoryInterface(extensionCandidate, loader);
 
-      if (extensionCandidateRepositoryInterface != null) {
-        List<Class<?>> extensionInterfaces = getRepositoryExtensionInterfaces( extensionCandidateRepositoryInterface );
-        for (Class<?> extensionInterface : extensionInterfaces) {
-          RepositoryExtensionConfiguration<T> configuration = getRepositoryExtensionConfiguration(
-                  extensionCandidateRepositoryInterface, extensionInterface, configSource );
-          result.add(configuration);
+        if (extensionCandidateRepositoryInterface != null) {
+          List<Class<?>> extensionInterfaces = getRepositoryExtensionInterfaces(extensionCandidateRepositoryInterface);
+          for (Class<?> extensionInterface : extensionInterfaces) {
+            RepositoryExtensionConfiguration<?> configuration = getRepositoryExtensionConfiguration(
+                    extensionCandidateRepositoryInterface, extensionInterface, extendedRepositorySource);
+            result.add(configuration);
+          }
         }
       }
     }
 
     return result;
+  }
+
+  @Override
+  protected final Collection<Class<?>> getIdentifyingTypes() {
+    List<Class<?>> result = new ArrayList<>();
+    result.addAll(getIdentifyingRepositoryTypes());
+    result.addAll(getIdentifyingExtensionTypes());
+    return result;
+  }
+
+  /**
+   * Returns the types that indicate a store match when inspecting repositories for strict matches.
+   *
+   * @return
+   */
+  protected Collection<Class<?>> getIdentifyingRepositoryTypes() {
+    return Collections.emptyList();
   }
 
   /**
@@ -84,13 +100,9 @@ public abstract class ExtendingRepositoryConfigurationExtensionSupport extends R
     return result;
   }
 
-  private <T extends RepositoryConfigurationSource> RepositoryExtensionConfiguration<T> getRepositoryExtensionConfiguration(
+  private <T extends ExtendedRepositoryConfigurationSource> RepositoryExtensionConfiguration<T> getRepositoryExtensionConfiguration(
           Class<?> extendedRepositoryInterface, Class<?> extensionInterface, T configSource) {
-    BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(extensionInterface);
-    AbstractBeanDefinition extendingRepositoryBeanDefinition = builder.getBeanDefinition();
-    RepositoryConfiguration<T> extendingRepositoryConfig =
-            getRepositoryConfiguration( extendingRepositoryBeanDefinition, configSource );
-    return new DefaultRepositoryExtensionConfiguration<>( extendedRepositoryInterface, extendingRepositoryConfig );
+    return new DefaultRepositoryExtensionConfiguration<>( extendedRepositoryInterface, extensionInterface, configSource );
   }
 
   private Class<?> loadRepositoryInterface(BeanDefinition extensionCandidate, ResourceLoader loader) {

@@ -20,6 +20,7 @@ import me.snowdrop.data.hibernatesearch.TestUtils;
 import me.snowdrop.data.hibernatesearch.config.HibernateSearchDataInfinispanAutoConfiguration;
 import me.snowdrop.data.hibernatesearch.config.smoke.jpa.JpaConfiguration;
 import me.snowdrop.data.hibernatesearch.config.smoke.Fruit;
+import me.snowdrop.data.hibernatesearch.config.smoke.repository.extension.hibernatesearch.FruitRepositoryHibernateSearchExtension;
 import me.snowdrop.data.hibernatesearch.config.smoke.repository.extension.jpa.FruitExtendedJpaRepository;
 import org.junit.Assert;
 import org.junit.Test;
@@ -28,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.repository.Repository;
 import org.springframework.test.context.junit4.SpringRunner;
 
 /**
@@ -37,6 +39,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 @EnableAutoConfiguration(exclude = HibernateSearchDataInfinispanAutoConfiguration.class)
 public class ExtendedJpaTests {
+  // TODO Make sure that there is only one matching repository implementation
+//  @Autowired
+//  Repository<Fruit, Long> singleRepositoryImplementation;
   @Autowired
   FruitExtendedJpaRepository jpaRepository;
 

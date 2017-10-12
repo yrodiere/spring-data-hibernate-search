@@ -15,17 +15,18 @@
  */
 package me.snowdrop.data.repository.extension.config;
 
-import org.springframework.data.repository.config.RepositoryConfiguration;
-import org.springframework.data.repository.config.RepositoryConfigurationSource;
-
-public class DefaultRepositoryExtensionConfiguration<T extends RepositoryConfigurationSource> implements RepositoryExtensionConfiguration<T> {
+public class DefaultRepositoryExtensionConfiguration<T extends ExtendedRepositoryConfigurationSource>
+        implements RepositoryExtensionConfiguration<T> {
 
   private final Class<?> extendedRepositoryInterface;
-  private final RepositoryConfiguration<T> extendingRepositoryConfiguration;
+  private final Class<?> repositoryExtensionInterface;
+  private final T configSource;
 
-  public DefaultRepositoryExtensionConfiguration(Class<?> extendedRepositoryInterface, RepositoryConfiguration<T> extendingRepositoryConfiguration) {
+  public DefaultRepositoryExtensionConfiguration(
+          Class<?> extendedRepositoryInterface, Class<?> repositoryExtensionInterface, T configSource) {
     this.extendedRepositoryInterface = extendedRepositoryInterface;
-    this.extendingRepositoryConfiguration = extendingRepositoryConfiguration;
+    this.repositoryExtensionInterface = repositoryExtensionInterface;
+    this.configSource = configSource;
   }
 
   @Override
@@ -34,7 +35,12 @@ public class DefaultRepositoryExtensionConfiguration<T extends RepositoryConfigu
   }
 
   @Override
-  public RepositoryConfiguration<T> getExtendingRepositoryConfiguration() {
-    return extendingRepositoryConfiguration;
+  public Class<?> getRepositoryExtensionInterface() {
+    return repositoryExtensionInterface;
+  }
+
+  @Override
+  public T getConfigurationSource() {
+    return configSource;
   }
 }

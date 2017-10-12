@@ -15,12 +15,15 @@
  */
 package me.snowdrop.data.repository.extension.config;
 
-public interface RepositoryExtensionConfiguration<T extends ExtendedRepositoryConfigurationSource> {
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.core.io.ResourceLoader;
 
-  Class<?> getExtendedRepositoryInterface();
+import java.util.Collection;
 
-  Class<?> getRepositoryExtensionInterface();
+public interface ExtendedRepositoryConfigurationSource {
 
-  T getConfigurationSource();
+  String getExtensionImplementationPostfix();
+
+  Collection<BeanDefinition> getCandidatesToExtension(ResourceLoader loader);
 
 }

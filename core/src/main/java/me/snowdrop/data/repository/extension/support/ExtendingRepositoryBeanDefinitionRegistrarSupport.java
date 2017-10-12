@@ -15,7 +15,7 @@
  */
 package me.snowdrop.data.repository.extension.support;
 
-import me.snowdrop.data.repository.extension.config.AnnotationRepositoryExtensionConfigurationSource;
+import me.snowdrop.data.repository.extension.config.AnnotationExtendingRepositoryConfigurationSource;
 import me.snowdrop.data.repository.extension.config.ExtendingRepositoryConfigurationExtension;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -31,17 +31,18 @@ import org.springframework.util.Assert;
 import java.lang.annotation.Annotation;
 
 /**
- * Base class to implement {@link ImportBeanDefinitionRegistrar}s to enable repository extensions.
+ * Base class to implement {@link ImportBeanDefinitionRegistrar}s to enable repositories,
+ * potentially extending other repositories.
  * <p>
  * Copy/pasted and adapted from {@link RepositoryBeanDefinitionRegistrarSupport}
  * in order to use {@link RepositoryExtensionConfigurationDelegate} instead of {@link RepositoryConfigurationDelegate}
- * and {@link me.snowdrop.data.repository.extension.config.AnnotationRepositoryExtensionConfigurationSource}
+ * and {@link AnnotationExtendingRepositoryConfigurationSource}
  * instead of {@link AnnotationRepositoryConfigurationSource}.
  *
  * @author Oliver Gierke
  * @author Yoann Rodiere
  */
-public abstract class RepositoryExtensionBeanDefinitionRegistrarSupport
+public abstract class ExtendingRepositoryBeanDefinitionRegistrarSupport
         implements ImportBeanDefinitionRegistrar, ResourceLoaderAware, EnvironmentAware {
 
   private ResourceLoader resourceLoader;
@@ -67,18 +68,16 @@ public abstract class RepositoryExtensionBeanDefinitionRegistrarSupport
       return;
     }
 
-    AnnotationRepositoryExtensionConfigurationSource configurationSource = new AnnotationRepositoryExtensionConfigurationSource(
-            annotationMetadata, getAnnotation(), resourceLoader, environment, registry);
+    AnnotationExtendingRepositoryConfigurationSource configurationSource = new AnnotationExtendingRepositoryConfigurationSource(
+            annotationMetadata, getAnnotation(), getExtendAnnotation(), resourceLoader, environment, registry);
 
     ExtendingRepositoryConfigurationExtension extension = getExtension();
-    // Do NOT expose the registration so as not to confuse extensions with actual repositories
-    // TODO: expose the extension registration some other way?
-    //RepositoryConfigurationUtils.exposeRegistration(extension, registry, configurationSource);
+    RepositoryConfigurationUtils.exposeRegistration(extension, registry, configurationSource);
 
     RepositoryExtensionConfigurationDelegate delegate = new RepositoryExtensionConfigurationDelegate(
             configurationSource, resourceLoader, environment);
 
-    delegate.registerRepositoriesIn(registry, extension);
+    delegate.registerRepositoriesAndExtensionsIn(registry, extension);
   }
 
   /**
@@ -89,6 +88,17 @@ public abstract class RepositoryExtensionBeanDefinitionRegistrarSupport
    * @return
    */
   protected abstract Class<? extends Annotation> getAnnotation();
+
+  /**
+   * Return the annotation to obtain extension configuration information from.
+   * Expected to be found in an array named "extensions" in the {@link #getAnnotation() main annotation}.
+   * Will be wrapped into an
+   * {@link AnnotationRepositoryConfigurationSource} so have a look at the constants in there for what annotation
+   * attributes it expects.
+   *
+   * @return
+   */
+  protected abstract Class<? extends Annotation> getExtendAnnotation();
 
   /**
    * Returns the {@link ExtendingRepositoryConfigurationExtension} for store specific callbacks and {@link BeanDefinition}

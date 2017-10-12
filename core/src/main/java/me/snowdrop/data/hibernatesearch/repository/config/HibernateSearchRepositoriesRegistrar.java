@@ -17,21 +17,14 @@
 package me.snowdrop.data.hibernatesearch.repository.config;
 
 import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.List;
 
-import org.springframework.beans.factory.parsing.BeanComponentDefinition;
-import org.springframework.beans.factory.support.AbstractBeanDefinition;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-import org.springframework.core.type.AnnotationMetadata;
-import org.springframework.data.repository.config.*;
-import org.springframework.util.Assert;
+import me.snowdrop.data.repository.extension.config.ExtendingRepositoryConfigurationExtension;
+import me.snowdrop.data.repository.extension.support.ExtendingRepositoryBeanDefinitionRegistrarSupport;
 
 /**
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public class HibernateSearchRepositoriesRegistrar extends RepositoryBeanDefinitionRegistrarSupport {
+public class HibernateSearchRepositoriesRegistrar extends ExtendingRepositoryBeanDefinitionRegistrarSupport {
 
   @Override
   protected Class<? extends Annotation> getAnnotation() {
@@ -39,7 +32,12 @@ public class HibernateSearchRepositoriesRegistrar extends RepositoryBeanDefiniti
   }
 
   @Override
-  protected RepositoryConfigurationExtension getExtension() {
+  protected Class<? extends Annotation> getExtendAnnotation() {
+    return EnableHibernateSearchRepositories.Extend.class;
+  }
+
+  @Override
+  protected ExtendingRepositoryConfigurationExtension getExtension() {
     return new HibernateSearchRepositoryConfigExtension();
   }
 
