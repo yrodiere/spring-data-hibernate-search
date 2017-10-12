@@ -22,7 +22,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 import me.snowdrop.data.hibernatesearch.repository.HibernateSearchRepository;
-import me.snowdrop.data.hibernatesearch.repository.RepositoryHibernateSearchExtension;
+import me.snowdrop.data.hibernatesearch.repository.extension.RepositoryHibernateSearchExtension;
 import me.snowdrop.data.hibernatesearch.repository.support.HibernateSearchRepositoryFactoryBean;
 import org.hibernate.search.annotations.Indexed;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;

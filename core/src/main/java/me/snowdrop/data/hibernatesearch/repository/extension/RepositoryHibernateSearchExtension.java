@@ -13,11 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package me.snowdrop.data.hibernatesearch.repository.extension.support;
 
-import org.springframework.data.repository.Repository;
+package me.snowdrop.data.hibernatesearch.repository.extension;
+
+import me.snowdrop.data.repository.extension.RepositoryExtension;
+import org.springframework.data.repository.NoRepositoryBean;
 
 import java.io.Serializable;
 
-public interface RepositoryExtension<T, ID extends Serializable> extends Repository<T, ID> {
+@NoRepositoryBean
+public interface RepositoryHibernateSearchExtension<T, ID extends Serializable> extends RepositoryExtension<T, ID> {
+
 }

@@ -17,7 +17,7 @@
 package me.snowdrop.data.hibernatesearch.config.smoke.repository.extension.hibernatesearch;
 
 import me.snowdrop.data.hibernatesearch.config.smoke.Fruit;
-import me.snowdrop.data.hibernatesearch.repository.RepositoryHibernateSearchExtension;
+import me.snowdrop.data.hibernatesearch.repository.extension.RepositoryHibernateSearchExtension;
 
 public interface FruitRepositoryHibernateSearchExtension extends RepositoryHibernateSearchExtension<Fruit, Long> {
   Fruit findByName(String name);
