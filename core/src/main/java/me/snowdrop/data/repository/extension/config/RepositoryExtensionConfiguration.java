@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package me.snowdrop.data.repository.extension.config;
 
-package me.snowdrop.data.hibernatesearch.config.smoke.jpa.extension;
+import org.springframework.data.repository.config.RepositoryConfiguration;
+import org.springframework.data.repository.config.RepositoryConfigurationSource;
 
-import me.snowdrop.data.hibernatesearch.config.smoke.repository.extension.jpa.FruitExtendedJpaRepository;
-import me.snowdrop.data.hibernatesearch.repository.extension.config.EnableRepositoryHibernateSearchExtensions;
-import org.springframework.context.annotation.Configuration;
+public interface RepositoryExtensionConfiguration<T extends RepositoryConfigurationSource> {
 
-@Configuration
-@EnableRepositoryHibernateSearchExtensions(basePackageClasses = FruitExtendedJpaRepository.class)
-public class HibernateSearchJpaRepositoryExtensionConfiguration {
+  Class<?> getExtendedRepositoryInterface();
+
+  RepositoryConfiguration<T> getExtendingRepositoryConfiguration();
 
 }
