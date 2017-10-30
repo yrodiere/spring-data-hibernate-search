@@ -17,11 +17,8 @@
 package me.snowdrop.data.hibernatesearch.repository.extension;
 
 import me.snowdrop.data.repository.extension.RepositoryExtension;
-import org.springframework.data.repository.NoRepositoryBean;
 
-import java.io.Serializable;
 
-@NoRepositoryBean
 public interface RepositoryHibernateSearchExtension<T, ID> extends RepositoryExtension<T, ID> {
 
 }

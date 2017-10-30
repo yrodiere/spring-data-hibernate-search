@@ -65,21 +65,4 @@ public @interface EnableHibernateSearchRepositories {
    */
   String datasourceMapperRef() default "datasourceMapper";
 
-  Extend[] extend() default {};
-
-  @interface Extend {
-
-    String[] value() default {};
-
-    String[] basePackages() default {};
-
-    Class<?>[] basePackageClasses() default {};
-
-    ComponentScan.Filter[] includeFilters() default {};
-
-    ComponentScan.Filter[] excludeFilters() default {};
-
-    String repositoryImplementationPostfix() default "Impl";
-    
-  }
 }

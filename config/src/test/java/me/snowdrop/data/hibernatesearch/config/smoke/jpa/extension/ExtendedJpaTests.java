@@ -18,30 +18,42 @@ package me.snowdrop.data.hibernatesearch.config.smoke.jpa.extension;
 
 import me.snowdrop.data.hibernatesearch.TestUtils;
 import me.snowdrop.data.hibernatesearch.config.HibernateSearchDataInfinispanAutoConfiguration;
+import me.snowdrop.data.hibernatesearch.config.HibernateSearchDataJpaAutoConfiguration;
 import me.snowdrop.data.hibernatesearch.config.smoke.jpa.JpaConfiguration;
 import me.snowdrop.data.hibernatesearch.config.smoke.Fruit;
-import me.snowdrop.data.hibernatesearch.config.smoke.repository.extension.hibernatesearch.FruitRepositoryHibernateSearchExtension;
 import me.snowdrop.data.hibernatesearch.config.smoke.repository.extension.jpa.FruitExtendedJpaRepository;
+import me.snowdrop.data.hibernatesearch.orm.repository.support.JpaWithHibernateSearchRepositoryFactoryBean;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.repository.Repository;
 import org.springframework.test.context.junit4.SpringRunner;
 
 /**
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-@SpringBootTest(classes = {JpaConfiguration.class, ExtendedJpaRepositoryConfiguration.class}, properties = "debug=false")
+@SpringBootTest(classes = JpaConfiguration.class, properties = "debug=false")
 @RunWith(SpringRunner.class)
-@EnableAutoConfiguration(exclude = HibernateSearchDataInfinispanAutoConfiguration.class)
+@EnableAutoConfiguration(exclude = {
+        HibernateSearchDataInfinispanAutoConfiguration.class,
+        HibernateSearchDataJpaAutoConfiguration.class // Not needed in this case
+})
+@EnableJpaRepositories(
+        basePackageClasses = FruitExtendedJpaRepository.class,
+        repositoryFactoryBeanClass = JpaWithHibernateSearchRepositoryFactoryBean.class
+)
 public class ExtendedJpaTests {
-  // TODO Make sure that there is only one matching repository implementation
-//  @Autowired
-//  Repository<Fruit, Long> singleRepositoryImplementation;
+  /*
+   * This makes sure that there is only one matching repository implementation
+   * (which seems to be necessary for the Spring Data REST integration to work properly)
+   */
+  @Autowired
+  Repository<Fruit, Long> singleRepositoryImplementation;
+
   @Autowired
   FruitExtendedJpaRepository jpaRepository;
 

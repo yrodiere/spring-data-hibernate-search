@@ -15,7 +15,5 @@
  */
 package me.snowdrop.data.repository.extension;
 
-import org.springframework.data.repository.Repository;
-
-public interface RepositoryExtension<T, ID> extends Repository<T, ID> {
+public interface RepositoryExtension<T, ID> {
 }

@@ -17,13 +17,12 @@
 package me.snowdrop.data.hibernatesearch.repository.config;
 
 import me.snowdrop.data.hibernatesearch.repository.HibernateSearchRepository;
-import me.snowdrop.data.hibernatesearch.repository.extension.RepositoryHibernateSearchExtension;
 import me.snowdrop.data.hibernatesearch.repository.support.HibernateSearchRepositoryFactoryBean;
-import me.snowdrop.data.repository.extension.config.ExtendingRepositoryConfigurationExtensionSupport;
 import org.hibernate.search.annotations.Indexed;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.data.repository.config.AnnotationRepositoryConfigurationSource;
+import org.springframework.data.repository.config.RepositoryConfigurationExtensionSupport;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;
@@ -32,7 +31,7 @@ import java.util.Collections;
 /**
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public class HibernateSearchRepositoryConfigExtension extends ExtendingRepositoryConfigurationExtensionSupport {
+public class HibernateSearchRepositoryConfigExtension extends RepositoryConfigurationExtensionSupport {
   @Override
   protected String getModulePrefix() {
     return "hibernatesearch";
@@ -44,13 +43,8 @@ public class HibernateSearchRepositoryConfigExtension extends ExtendingRepositor
   }
 
   @Override
-  protected Collection<Class<?>> getIdentifyingRepositoryTypes() {
+  protected Collection<Class<?>> getIdentifyingTypes() {
     return Collections.singletonList(HibernateSearchRepository.class);
-  }
-
-  @Override
-  protected Collection<Class<?>> getIdentifyingExtensionTypes() {
-    return Collections.singletonList(RepositoryHibernateSearchExtension.class);
   }
 
   @Override
