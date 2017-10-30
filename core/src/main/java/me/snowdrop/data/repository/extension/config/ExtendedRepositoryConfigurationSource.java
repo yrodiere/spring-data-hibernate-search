@@ -18,12 +18,12 @@ package me.snowdrop.data.repository.extension.config;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.core.io.ResourceLoader;
 
-import java.util.Collection;
+import java.util.Optional;
 
 public interface ExtendedRepositoryConfigurationSource {
 
-  String getExtensionImplementationPostfix();
+  Optional<String> getExtensionImplementationPostfix();
 
-  Collection<BeanDefinition> getCandidatesToExtension(ResourceLoader loader);
+  Iterable<BeanDefinition> getCandidatesToExtension(ResourceLoader loader);
 
 }

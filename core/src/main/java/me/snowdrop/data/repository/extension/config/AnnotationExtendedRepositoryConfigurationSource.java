@@ -25,7 +25,7 @@ import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.data.repository.config.AnnotationRepositoryConfigurationSource;
 
 import java.lang.annotation.Annotation;
-import java.util.Collection;
+import java.util.Optional;
 
 public class AnnotationExtendedRepositoryConfigurationSource implements ExtendedRepositoryConfigurationSource {
 
@@ -42,12 +42,12 @@ public class AnnotationExtendedRepositoryConfigurationSource implements Extended
   }
 
   @Override
-  public String getExtensionImplementationPostfix() {
+  public Optional<String> getExtensionImplementationPostfix() {
     return delegate.getRepositoryImplementationPostfix();
   }
 
   @Override
-  public Collection<BeanDefinition> getCandidatesToExtension(ResourceLoader loader) {
+  public Iterable<BeanDefinition> getCandidatesToExtension(ResourceLoader loader) {
     return delegate.getCandidates(loader);
   }
 }

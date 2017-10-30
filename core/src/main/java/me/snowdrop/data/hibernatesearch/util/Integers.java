@@ -13,15 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package me.snowdrop.data.hibernatesearch.util;
 
-package me.snowdrop.data.hibernatesearch.repository.extension;
+public final class Integers {
 
-import me.snowdrop.data.repository.extension.RepositoryExtension;
-import org.springframework.data.repository.NoRepositoryBean;
+  private Integers() {
+  }
 
-import java.io.Serializable;
-
-@NoRepositoryBean
-public interface RepositoryHibernateSearchExtension<T, ID> extends RepositoryExtension<T, ID> {
+  public static int safeCast(long value) {
+    if ( value > Integer.MAX_VALUE ) {
+      return Integer.MAX_VALUE;
+    }
+    else if ( value < Integer.MIN_VALUE ) {
+      return Integer.MIN_VALUE;
+    }
+    else {
+      return (int) value;
+    }
+  }
 
 }

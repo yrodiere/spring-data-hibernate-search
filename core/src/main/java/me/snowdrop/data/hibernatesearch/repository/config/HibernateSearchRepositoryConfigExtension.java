@@ -54,7 +54,7 @@ public class HibernateSearchRepositoryConfigExtension extends ExtendingRepositor
   }
 
   @Override
-  public String getRepositoryFactoryClassName() {
+  public String getRepositoryFactoryBeanClassName() {
     return HibernateSearchRepositoryFactoryBean.class.getName();
   }
 

@@ -17,7 +17,5 @@ package me.snowdrop.data.repository.extension;
 
 import org.springframework.data.repository.Repository;
 
-import java.io.Serializable;
-
-public interface RepositoryExtension<T, ID extends Serializable> extends Repository<T, ID> {
+public interface RepositoryExtension<T, ID> extends Repository<T, ID> {
 }

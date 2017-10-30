@@ -84,12 +84,12 @@ public class RepositoryExtensionConfigurationDelegate {
 
       Class<?> extendedRepositoryInterface = extensionConfiguration.getExtendedRepositoryInterface();
       String capitalizedBeanName = ClassUtils.getShortName(extendedRepositoryInterface)
-              + extensionConfiguration.getConfigurationSource().getExtensionImplementationPostfix();
+              + extensionConfiguration.getConfigurationSource().getExtensionImplementationPostfix().orElse("Impl");
       String overriddenBeanName = StringUtils.uncapitalize(capitalizedBeanName);
 
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug(REPOSITORY_EXTENSION_REGISTRATION, extension.getModuleName(), overriddenBeanName,
-                repositoryExtensionInterface, extension.getRepositoryFactoryClassName(),
+                repositoryExtensionInterface, extension.getRepositoryFactoryBeanClassName(),
                 extendedRepositoryInterface);
       }
 
