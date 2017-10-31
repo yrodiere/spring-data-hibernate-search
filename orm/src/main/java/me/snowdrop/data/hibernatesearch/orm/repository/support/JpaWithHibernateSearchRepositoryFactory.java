@@ -15,19 +15,13 @@
  */
 package me.snowdrop.data.hibernatesearch.orm.repository.support;
 
-import me.snowdrop.data.hibernatesearch.core.HibernateSearchOperations;
-import me.snowdrop.data.hibernatesearch.core.HibernateSearchTemplate;
-import me.snowdrop.data.hibernatesearch.orm.JpaDatasourceMapper;
 import me.snowdrop.data.hibernatesearch.repository.support.HibernateSearchRepositoryFactory;
-import me.snowdrop.data.hibernatesearch.spi.DatasourceMapper;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactory;
-import org.springframework.data.repository.core.NamedQueries;
 import org.springframework.data.repository.core.RepositoryMetadata;
 import org.springframework.data.repository.core.support.RepositoryComposition.RepositoryFragments;
 import org.springframework.data.repository.query.EvaluationContextProvider;
-import org.springframework.data.repository.query.QueryLookupStrategy;
 
 import javax.persistence.EntityManager;
 
@@ -35,25 +29,10 @@ public class JpaWithHibernateSearchRepositoryFactory extends JpaRepositoryFactor
 
   private final HibernateSearchRepositoryFactory hibernateSearchRepositoryFactory;
 
-  public JpaWithHibernateSearchRepositoryFactory(EntityManager entityManager) {
+  public JpaWithHibernateSearchRepositoryFactory(
+          EntityManager entityManager, HibernateSearchRepositoryFactory hibernateSearchRepositoryFactory) {
     super(entityManager);
-    DatasourceMapper datasourceMapper = new JpaDatasourceMapper(entityManager.getEntityManagerFactory());
-    HibernateSearchOperations operations = new HibernateSearchTemplate(datasourceMapper);
-    hibernateSearchRepositoryFactory = new HibernateSearchRepositoryFactory(operations);
-  }
-
-  @Override
-  public void setQueryLookupStrategyKey(QueryLookupStrategy.Key key) {
-    super.setQueryLookupStrategyKey(key);
-    // TODO separate HSearch config from JPA config
-    hibernateSearchRepositoryFactory.setQueryLookupStrategyKey(key);
-  }
-
-  @Override
-  public void setNamedQueries(NamedQueries namedQueries) {
-    super.setNamedQueries(namedQueries);
-    // TODO separate HSearch config from JPA config
-    hibernateSearchRepositoryFactory.setNamedQueries(namedQueries);
+    this.hibernateSearchRepositoryFactory = hibernateSearchRepositoryFactory;
   }
 
   @Override

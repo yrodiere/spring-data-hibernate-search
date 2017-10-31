@@ -22,6 +22,7 @@ import me.snowdrop.data.hibernatesearch.config.HibernateSearchDataJpaAutoConfigu
 import me.snowdrop.data.hibernatesearch.config.smoke.jpa.JpaConfiguration;
 import me.snowdrop.data.hibernatesearch.config.smoke.Fruit;
 import me.snowdrop.data.hibernatesearch.config.smoke.repository.extension.jpa.FruitExtendedJpaRepository;
+import me.snowdrop.data.hibernatesearch.orm.repository.config.JpaWithHibernateSearchConfiguration;
 import me.snowdrop.data.hibernatesearch.orm.repository.support.JpaWithHibernateSearchRepositoryFactoryBean;
 import org.junit.Assert;
 import org.junit.Test;
