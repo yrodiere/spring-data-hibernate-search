@@ -106,6 +106,11 @@ public class OpsDefaultBase extends OpsTestsBase {
   }
 
   @Test
+  public void testNotAndNot() {
+    assertSize(repository.findByTextNotContainingAndTextNotContaining("running", "apples" ), 4);
+  }
+
+  @Test
   public void testFindByNameIn() {
     assertSize(repository.findByNameIn(Collections.singleton("barb")), 1);
   }

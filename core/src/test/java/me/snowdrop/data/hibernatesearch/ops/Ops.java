@@ -56,6 +56,8 @@ public interface Ops {
 
   List<SimpleEntity> findByTextNotContaining(String text);
 
+  List<SimpleEntity> findByTextNotContainingAndTextNotContaining(String text1, String text2);
+
   @TargetField(property = "name", field = "identity.name")
   List<SimpleEntity> findByNameIn(Collection<String> names);
 
